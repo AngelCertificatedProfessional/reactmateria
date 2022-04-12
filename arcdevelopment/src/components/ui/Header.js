@@ -13,8 +13,10 @@ import logo from '../../assets/logo.svg'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import { toBeInTheDocument } from '@testing-library/jest-dom/dist/matchers';
-import { useMediaQuery } from '@material-ui/core';
+import { IconButton, useMediaQuery } from '@material-ui/core';
 import { useTheme } from '@material-ui/core';
+import { SwipeableDrawer } from '@material-ui/core';
+import MenuIcon from "@material-ui/icons/Menu"
 
 //seccion para trabajar la parte del scroll
 function ElevationScroll(props) {
@@ -81,6 +83,16 @@ const useStyles = makeStyles( theme => ({
     "&:hover":{
       opacity:1
     }
+  },
+  drawerIcon: {
+    height:"50px",
+    width:"50px"
+  },
+  drawerIconContainer: {
+    marginLeft: "auto",
+    "&:hover":{
+      backgroundColor:"transparent"
+    }
   }
 }))
 
@@ -90,32 +102,36 @@ export default function Header(props){
   const classes = useStyles()
 
   const theme = useTheme();
+
+  const iOS = typeof navigator !== "undefined" && /iPad|iPhone|iPod/.test(navigator.userAgent);
+
   const matches = useMediaQuery(theme.breakpoints.down("md"))
 
+  const [openDrawer,setOpenDrawer] = useState(false)
 
   const [value,setValue] = useState(0); 
   const [anchorEl,setAnchorEl] = useState(null)
-  const [open,setOpen] = useState(false);
+  const [openMenu,setOpenMenu] = useState(false);
   const [selectedIndex,setSelectedIndex] = useState(0)
 
   const handleMenuItemClick = (e,i) => {
     setAnchorEl(null);
-    setOpen(false);
+    setOpenMenu(false);
     setSelectedIndex(i);
   }
 
-  const handleChange = (e,value) =>{
-    setValue(value)
+  const handleChange = (e,newValue) =>{
+    setValue(newValue)
   }
 
   const handleClick = (e) => {
     setAnchorEl(e.currentTarget);
-    setOpen(true)
+    setOpenMenu(true)
   }
 
   const handleClose = (e) => {
     setAnchorEl(null)
-    setOpen(false)
+    setOpenMenu(false)
   }
 
 
@@ -211,7 +227,7 @@ export default function Header(props){
     <Button variant="contained" color="secondary" className={classes.button}>
       Free Estimate  
     </Button>
-    <Menu id="simple-menu" classes={{paper:classes.menu}} anchorEl={anchorEl} open={open} onClose={handleClose} MenuListProps={{onMouseLeave: handleClose}} elevation={0}>
+    <Menu id="simple-menu" classes={{paper:classes.menu}} anchorEl={anchorEl} open={openMenu} onClose={handleClose} MenuListProps={{onMouseLeave: handleClose}} elevation={0}>
       {menuOptions.map((option,i) => (
         <MenuItem key={i} classes={{root:classes.menuItem}} component={Link} to={option.link} onClick={(event) => {handleMenuItemClick(event,i); setValue(1); handleClose()}}  selected={i===selectedIndex && value ===1}>
           {option.name}
@@ -219,6 +235,17 @@ export default function Header(props){
       ))}
     </Menu>
     </>
+  )
+
+  const drawer = (
+    <React.Fragment>
+      <SwipeableDrawer disableBackdropTransition={!iOS} disableDiscovery={iOS} open={openDrawer} onClose={() => setOpenDrawer(false)} onOpen={() => setOpenDrawer(true)}>
+        Example Drawer
+      </SwipeableDrawer>
+      <IconButton className = {classes.drawerIconContainer} onClick={() => setOpenDrawer(!openDrawer)} disableRipple>
+        <MenuIcon className={classes.drawerIcon}/>
+      </IconButton>
+    </React.Fragment>
   )
 
     return(
@@ -229,7 +256,7 @@ export default function Header(props){
                       <Button component={Link} to="/" disableRipple className={classes.logoContainer} onClick={() => setValue(0)} >
                         <img src={logo} className={classes.logo} alt="company logo" />
                       </Button>
-                      {matches ? null : tabs}
+                      {matches ? drawer : tabs}
                       {/* <Typography variant="h3" color="secondary">
                         Arc Development
                       </Typography> */}
