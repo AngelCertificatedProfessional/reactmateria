@@ -189,14 +189,14 @@ export default function Header(props){
     <>
       <Tabs value={value} onChange={handleChange} className={classes.tabContainer} indicatorColor="primary">
         {routes.map((route,index) => (
-          <Tab className={classes.tab} component={Link} to={route.link} label={route.name} 
+          <Tab key={`${route}${index}`} className={classes.tab} component={Link} to={route.link} label={route.name} 
           aria-owns={route.arialOwns} aria-haspopup={route.ariaPopup} onMouseOver = {route.mouseOver}/>
         ))}
       </Tabs>
     <Button variant="contained" color="secondary" className={classes.button}>
       Free Estimate  
     </Button>
-    <Menu id="simple-menu" classes={{paper:classes.menu}} anchorEl={anchorEl} open={openMenu} onClose={handleClose} MenuListProps={{onMouseLeave: handleClose}} elevation={0}>
+    <Menu id="simple-menu" classes={{paper:classes.menu}} anchorEl={anchorEl} open={openMenu} onClose={handleClose} MenuListProps={{onMouseLeave: handleClose}} elevation={0} keepMounted>
       {menuOptions.map((option,i) => (
         <MenuItem key={i} classes={{root:classes.menuItem}} component={Link} to={option.link} onClick={(event) => {handleMenuItemClick(event,i); setValue(1); handleClose()}}  selected={i===selectedIndex && value ===1}>
           {option.name}
@@ -216,42 +216,15 @@ export default function Header(props){
       >
         <List disablePadding>
           
-          {routes.map((route,index) => {
-            <ListItem divider button component={Link} onClick={() => {setOpenDrawer(false);setValue(route.activeIndex) }}>
-              <ListItemText disableTypography>{route.name}</ListItemText>
+          {routes.map(route => (
+            <ListItem key={`${route}${route.activeIndex}`} onClick={() => {setOpenDrawer(false);setValue(route.activeIndex) }} divider button component={Link} to={route.link} selected={value === route.activeIndex} >
+              <ListItemText className={value === route.activeIndex ? [classes.drawerItem,classes.drawerItemSelected] : classes.drawerItem} disableTypography>
+                {route.name}
+              </ListItemText>
             </ListItem>
-          })}
+            
+          ))}
 
-          <ListItem onClick={() => {setOpenDrawer(false); setValue(0)}} divider button component={Link} to="/" selected={value ===0}>
-            <ListItemText className={value === 0 ? [classes.drawerItem,classes.drawerItemSelected] :classes.drawerItem} disableTypography>
-              Home
-            </ListItemText>
-          </ListItem>
-          <ListItem onClick={() => {setOpenDrawer(false); setValue(1)}} divider button component={Link} to="/services" selected={value ===1}>
-            <ListItemText className={value === 1 ? [classes.drawerItem,classes.drawerItemSelected] :classes.drawerItem} disableTypography>
-              Services
-            </ListItemText>
-          </ListItem>
-          <ListItem onClick={() => {setOpenDrawer(false); setValue(2)}} divider button component={Link} to="/revolution" selected={value ===2}>
-            <ListItemText className={value === 2 ? [classes.drawerItem,classes.drawerItemSelected] :classes.drawerItem} disableTypography>
-              Revolution
-            </ListItemText>
-          </ListItem>
-          <ListItem onClick={() => {setOpenDrawer(false); setValue(3)}} divider button component={Link} to="/about" selected={value ===3}>
-            <ListItemText className={value === 3 ? [classes.drawerItem,classes.drawerItemSelected] :classes.drawerItem} disableTypography>
-              About Us
-            </ListItemText>
-          </ListItem>
-          <ListItem onClick={() => {setOpenDrawer(false); setValue(4)}} divider button component={Link} to="/contact" selected={value ===4}>
-            <ListItemText className={value === 4 ? [classes.drawerItem,classes.drawerItemSelected] :classes.drawerItem} disableTypography>
-              Contact Us
-            </ListItemText>
-          </ListItem>
-          <ListItem onClick={() => {setOpenDrawer(false); setValue(5)}} className={classes.drawerItemEstimate} divider button component={Link} to="/estimate" selected={value ===5}>
-            <ListItemText className={value === 5 ? [classes.drawerItem,classes.drawerItemSelected] :classes.drawerItem} disableTypography>
-              Free Estimate
-            </ListItemText>
-          </ListItem>
         </List>
       </SwipeableDrawer>
       <IconButton className = {classes.drawerIconContainer} onClick={() => setOpenDrawer(!openDrawer)} disableRipple>
